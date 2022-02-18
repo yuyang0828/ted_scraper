@@ -67,7 +67,15 @@ def talk_write_into_file(title, url, driver, ws):
     language_code_list = [option.get_attribute(
         'value') for option in select.options]
 
-    if 'zh-cn' not in language_code_list and 'en' not in language_code_list:
+    if 'en' not in language_code_list:
+        return
+    has_other = False
+    for lang_code in LANGS[1:]:
+        if lang_code in language_code_list:
+            has_other = True
+            continue
+    if not has_other:
+        print('not have other language')
         return
 
     content_list = [title]
@@ -85,7 +93,7 @@ def talk_write_into_file(title, url, driver, ws):
 if __name__ == '__main__':
 
     index = 0
-
+    '''
     workbook = xlsxwriter.Workbook(SAVE_FILE)
     # Add style
     bold = workbook.add_format({'bold': True})
@@ -98,6 +106,7 @@ if __name__ == '__main__':
     for i in range(0, len(row0)):
         worksheet.write(0, i, row0[i], bold)
     workbook.close()
+    '''
 
     wb = load_workbook(SAVE_FILE)
     # Select First Worksheet
@@ -109,13 +118,13 @@ if __name__ == '__main__':
     # url = 'https://www.ted.com/talks/iseult_gillespie_the_myth_of_narcissus_and_echo'
     # talk_write_into_file('', url, driver, ws)
 
-    url = 'https://www.ted.com/talks?page='
+    base_url = 'https://www.ted.com/talks?page='
     start = int(input("input start page: "))
     end = int(input("input end page: "))
 
     for i in range(start, end+1):
         print('==> page: ' + str(i))
-        talk_url_dic = get_TED_talk_list(url, i)
+        talk_url_dic = get_TED_talk_list(base_url, i)
         for j, (title, url) in enumerate(talk_url_dic.items()):
             talk_write_into_file(title, url, driver, ws)
             print('====> page: ' + str(i) + ' no.' + str(j+1) +
